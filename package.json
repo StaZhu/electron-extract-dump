@@ -1,0 +1,24 @@
+{
+  "name": "electron-extract-dump",
+  "version": "1.0.0",
+  "description": "A tool to extract stack info from dmp + sym file to human readable content",
+  "devDependencies": {
+    "@types/node": "^16.7.10",
+    "cross-env": "^7.0.3",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
+  },
+  "scripts": {
+    "extract": "cross-env NODE_OPTIONS=\"–-max-old-space-size=9192\" ts-node src/extract.ts",
+    "stackwalk": "cross-env NODE_OPTIONS=\"–-max-old-space-size=9192\" ts-node src/stackWalk.ts",
+    "dump": "cross-env NODE_OPTIONS=\"–-max-old-space-size=9192\" ts-node src/dump.ts",
+    "modulelist": "cross-env NODE_OPTIONS=\"–-max-old-space-size=9192\" ts-node src/moduleList.ts",
+    "cluster": "cross-env NODE_OPTIONS=\"–-max-old-space-size=9192\" ts-node src/cluster.ts",
+    "analyze": "cross-env NODE_OPTIONS=\"–-max-old-space-size=9192\" ts-node src/analyzeByCrashReason.ts"
+  },
+  "author": "Sta Zhu (zhusidayoyo@hotmail.com)",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2"
+  }
+}
