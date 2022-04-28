@@ -75,7 +75,7 @@
 ### 用法
 1. 先利用 `npm run stackwalk /path/to/your/dump/dir` 解析好崩溃dump。
 2. 执行 `npm run cluster /path/to/your/dump/dir` 对崩溃聚类。
-3. 打开 `/path/to/your/dump/dir`，获取按函数名聚类后的目录。
+3. 打开 `cluster` 目录，可以看到按 `(total: ${count}) ${last line function name}` 聚类后的目录。
 
 ## License
 

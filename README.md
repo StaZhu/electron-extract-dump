@@ -75,8 +75,7 @@ Use the last function line name to cluster all crash files from the generated st
 ### Instruction
 1. make sure you have already run `npm run stackwalk /path/to/your/dump/dir` and generated those stack file.
 2. then execute `npm run cluster /path/to/your/dump/dir` to cluster the crash reason.
-3. open the `/path/to/your/dump/dir` and you will see crash dump and stack are move to the folder named with `last line function name`.
-
+3. open the `cluster` folder and you will see crash dump and stack in that folder named with `(total: ${count}) ${last line function name}`.
 
 ## License
 

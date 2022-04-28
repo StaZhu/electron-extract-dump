@@ -30,11 +30,8 @@ const reasonMap: Map<string, number> = new Map<string, number>();
       .split(/\r\n|\n/);
 
     const reason = stackContent.find(i => i.startsWith('Crash reason:'))?.match(crashReasonReg)![1] || '';
-    if (!reasonMap.get(reason)) {
-      reasonMap.set(reason, 1);
-    } else {
-      reasonMap.set(reason, (reasonMap.get(reason) || 0) + 1);
-    }
+    const count = reasonMap.get(reason);
+    reasonMap.set(reason, count ? count + 1 : 1);
   }
   console.table([...reasonMap.entries()].map(i => ({ 'Crash Reason': i[0], 'Count': i[1] })).sort((a, b) => b['Count'] - a['Count']), ['Crash Reason', 'Count']);
 })();
