@@ -118,7 +118,7 @@ const walkStackDump = async (dumpPath: string, stackPath: string) => {
     }
   });
 
-  console.time('total tooks');
+  const startTime = performance.now();
   let i = 0;
   let taskPromise = [];
   while (promises.length) {
@@ -139,6 +139,6 @@ const walkStackDump = async (dumpPath: string, stackPath: string) => {
   await Promise.all(taskPromise.map(t => t()));
   taskPromise = [];
   i = 0;
-  console.log(`total file count: ${chalk.green(promisesCount)}`)
-  console.timeEnd('total tooks');
+  const endTime = performance.now();
+  console.log(`total file count: ${chalk.green(promisesCount)}, total tooks: ${chalk.blue(endTime - startTime)}, each file tooks: ${chalk.greenBright((endTime - startTime) / promisesCount)}`)
 })();
