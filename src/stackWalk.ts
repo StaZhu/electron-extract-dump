@@ -1,7 +1,7 @@
 
 import { walkStack, dump } from './minidump';
 import { resolve } from 'path';
-import { writeFileSync, readdirSync, existsSync } from 'fs';
+import { writeFileSync, readdirSync, existsSync, watch } from 'fs';
 import { downloadSymbolIfNecessary } from './fetchSymbol';
 import chalk from 'chalk';
 
@@ -18,7 +18,7 @@ const NEED_EXTRACT_MDRAW = false;
  *
  * Instruction
  * 
- * 1. `wget -i list.txt`, and download those `.dmp` files.
+ * 1. `wget -i list.txt --tries=3 --continue ‐‐no-clobber`, and download those `.dmp` files.
  * 2. put `.dmp` files to `/path/to/your/dump/dir` (Default: `dump`).
  * 3. unzip `electron-v{version}-{platform}-{arch}-symbols.zip` of each platforms and arches and then copy all the files/folder from `breakpad_symbol` to `/path/to/electron-extract-dump/symbols` (must make sure the structure looks like `filename` - `breakpadId` - `filename.sym`).
  * 4. then execute `npm run stackwalk /path/to/your/dump/dir`.
@@ -52,13 +52,14 @@ const walkStackDump = async (dumpPath: string, stackPath: string) => {
 
 (async () => {
   const promises: Array<() => Promise<void>> = [];
-  for (const dumpPath of dumpPaths) {
+
+  const pushToPromises = (dumpPath: string) => {
     const dumpOutPath = dumpPath.replace('.dmp', '.dump.txt');
     const stackPath = dumpPath.replace('.dmp', '.stack.txt');
 
     // we can skip those already parsed one
     if (existsSync(stackPath) && !FORCE) {
-      continue;
+      return true;
     }
     
     if (NEED_EXTRACT_MDRAW) {
@@ -95,10 +96,27 @@ const walkStackDump = async (dumpPath: string, stackPath: string) => {
     }
   }
 
+  for (const dumpPath of dumpPaths) {
+    pushToPromises(dumpPath);
+  }
+
   let promisesCount = promises.length
   if (promisesCount) {
     console.log(`total file count: ${chalk.green(promisesCount)}`)
   }
+
+  watch(dumpDir, (e, filename: string) => {
+    if (e === 'rename' && filename.endsWith('.dmp')) {
+      const newFilePath = resolve(dumpDir, filename);
+      if (!dumpPaths.includes(newFilePath)) {
+        dumpPaths.push(newFilePath);
+        if (!pushToPromises(newFilePath)) {
+          promisesCount++;
+          console.log(`new file: ${chalk.blue(newFilePath)} added!, total count: ${chalk.green(promisesCount)}`,);
+        }
+      }
+    }
+  });
 
   console.time('total tooks');
   let i = 0;

@@ -13,7 +13,7 @@ import chalk from 'chalk';
  * 
  * Instruction
  *
- * 1. `wget -i list.txt`, and download those `.dmp` files.
+ * 1. `wget -i list.txt --tries=3 --continue ‐‐no-clobber`, and download those `.dmp` files.
  * 2. put `.dmp` files to `/path/to/your/dump/dir` (Default: `dump`).
  * 3. then execute `npm run dump /path/to/your/dump/dir`.
  * 4. open the `/path/to/your/dump/dir` and debug those `.dump.txt` stack.

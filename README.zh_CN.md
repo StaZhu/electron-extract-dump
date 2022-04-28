@@ -10,7 +10,7 @@
 自动批处理解析 `.dmp` 的C++崩溃堆栈 (Chromium, Electron, 或者 Node Addon)。
 
 ### 用法
-1. `wget -i list.txt`，批量下载好要解析的.dmp文件。
+1. `wget -i list.txt --tries=3 --continue ‐‐no-clobber`，批量下载好要解析的.dmp文件。
 2. 将.dmp放到你希望解析的dump目录 (默认：dump)。
 3. 将symbol目录解压缩，并将breakpad_symbol目录内容拷贝出来，需要确保包含.sym的文件夹按格式放置到Symbol目录 (必须按照 `文件名` - `breakpadId` - `文件名.sym`格式存放)。
 4. 执行 `npm run stackwalk /path/to/your/dump/dir`。
@@ -42,7 +42,7 @@
 将electron的原始内存信息提取出来。如果有用到 `crashReport.start()` 并附带了 `globalExtra`，则执行该命令可以将 `globalExtra` 参数暴露出来。
 
 ### 用法
-1. `wget -i list.txt`，批量下载好要解析的 `.dmp` 文件。
+1. `wget -i list.txt --tries=3 --continue ‐‐no-clobber`，批量下载好要解析的 `.dmp` 文件。
 2. 将 `.dmp` 放到你希望解析的dump目录 (默认：dump)。
 3. 执行 `npm run dump /path/to/your/dump/dir`。
 4. 打开 `/path/to/your/dump/dir`, 并debug生成的 `xxx.dump.txt`。
@@ -53,7 +53,7 @@
 将electron所引用的动态链接库位置与版本号枚举出来。
 
 ### 用法
-1. `wget -i list.txt`，批量下载好要解析的.dmp文件。
+1. `wget -i list.txt --tries=3 --continue ‐‐no-clobber`，批量下载好要解析的.dmp文件。
 2. 将 `.dmp` 放到 `/path/to/your/dump/dir` (默认：dump)。
 3. 执行 `npm run modulelist /path/to/your/dump/dir`。
 4. 打开 `/path/to/your/dump/dir` 并debug生成的 `.module.txt` 。
