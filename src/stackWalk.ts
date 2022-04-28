@@ -1,12 +1,13 @@
 
 import { walkStack, dump } from './minidump';
 import { resolve } from 'path';
+import { cpus } from 'os'
 import { writeFileSync, readdirSync, existsSync, watch } from 'fs';
 import { downloadSymbolIfNecessary } from './fetchSymbol';
 import chalk from 'chalk';
 
 const FORCE = false;
-const BATCH_TASK_COUNT = 10;
+const BATCH_TASK_COUNT = cpus().length * 8;
 // whether or not extract MDRAW as well (default: false)
 const NEED_EXTRACT_MDRAW = false;
 
@@ -118,27 +119,34 @@ const walkStackDump = async (dumpPath: string, stackPath: string) => {
     }
   });
 
-  const startTime = performance.now();
+  const startTime = Date.now();
   let i = 0;
-  let taskPromise = [];
-  while (promises.length) {
-    if (i === BATCH_TASK_COUNT) {
-      // BATCH_TASK_COUNT task per batch
-      await Promise.all(taskPromise.map(t => t()));
-      taskPromise = [];
-      i = 0;
-    } else {
-      const task = promises.shift();
-      if (task) {
-        taskPromise.push(task);
-        i++;
+
+  const checkPromisesCountAndExecute = () => {
+    return new Promise(resolve => {
+      while (promises.length && i < BATCH_TASK_COUNT) {
+        const task = promises.shift();
+        if (task) {
+          i++;
+          task().finally(() => {
+            i--;
+            checkPromisesCountAndExecute().then(() => {
+              if (!promises.length && i === 0) {
+                resolve(true);
+              }
+            })
+          });
+        }
       }
-    }
+      if (!promises.length && i === 0) {
+        resolve(true);
+      }
+    })
   }
-  // BATCH_TASK_COUNT task per batch
-  await Promise.all(taskPromise.map(t => t()));
-  taskPromise = [];
-  i = 0;
-  const endTime = performance.now();
-  console.log(`total file count: ${chalk.green(promisesCount)}, total tooks: ${chalk.blue(endTime - startTime)}, each file tooks: ${chalk.greenBright((endTime - startTime) / promisesCount)}`)
+
+  await checkPromisesCountAndExecute();
+
+  const endTime = Date.now();
+  const eachTooks = Math.floor((endTime - startTime) / promisesCount);
+  console.log(`total file count: ${chalk.green(promisesCount)}, total tooks: ${chalk.blue(endTime - startTime)} ms, each file tooks: ${chalk.greenBright((!isNaN(eachTooks) && eachTooks !== Infinity) ? eachTooks : 0)} ms`);
 })();
